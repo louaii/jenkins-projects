@@ -2,24 +2,26 @@ pipeline {
     agent any
 
     stages {
-        stage('Install Dependencies') {
+        stage('Check Environment') {
             steps {
-                echo 'Installing curl...'
-                // If you are on a Linux-based Jenkins Docker image
-                sh 'apt-get update && apt-get install -y curl' 
+                echo 'Checking if curl exists...'
+                // 'where' is the Windows version of 'which'
+                bat 'where curl'
             }
         }
         stage('Run App') {
             steps {
-                echo 'Executing our script...'
-                sh 'chmod +x app.sh'
-                sh './app.sh'
+                echo 'Executing our Windows Batch script...'
+                // On Windows, we don't need chmod. We just run the .bat file.
+                bat 'app.bat'
             }
         }
         stage('Artifact') {
             steps {
                 echo 'Archiving results...'
-                sh 'mkdir -p output && cp app.sh output/'
+                // Windows commands for making directory and copying
+                bat 'if not exist output mkdir output'
+                bat 'copy app.bat output\\'
                 archiveArtifacts artifacts: 'output/*', fingerprint: true
             }
         }
